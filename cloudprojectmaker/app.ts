@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 export interface GraderEvent {
-  eventString: string;
+  vpcId: string;
   eventBool: boolean;
 }
 interface GraderResult {
@@ -15,7 +15,6 @@ export const lambdaHandler = async (
   event: GraderEvent
 ): Promise<GraderResult> => {
   console.log(event);
-  const queries = JSON.stringify(event.eventString);
 
   const Mocha = require("mocha");
   const fs = require("fs");
@@ -53,6 +52,6 @@ export const lambdaHandler = async (
   console.log(data);
   return {
     resultBool: true,
-    resultString: `Queries: ${queries}`,
+    resultString: `Queries`,
   };
 };
