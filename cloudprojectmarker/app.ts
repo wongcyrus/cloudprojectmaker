@@ -41,7 +41,6 @@ export const lambdaHandler = async (
       mocha
         .reporter("xunit", { output: "/tmp/testspec.xunit.xml" })
         .ui("tdd")
-        .asyncOnly(true)
         .run((failures: number) => {
           resolve(failures);
         });
