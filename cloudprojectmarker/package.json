@@ -1,7 +1,7 @@
 {
-  "name": "cloudprojectmaker",
+  "name": "cloudprojectmarker",
   "version": "1.0.0",
-  "description": "Automatice marker for Cloud Project Assigment",
+  "description": "Automatic marker for Cloud Project Assigment",
   "main": "app.js",
   "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
   "author": "SAM CLI",

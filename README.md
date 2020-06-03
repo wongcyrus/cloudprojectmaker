@@ -1,4 +1,4 @@
-# cloudprojectmaker
+# cloudprojectmarker
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
 
@@ -128,4 +128,4 @@ nvm install 12
 nvm alias default
 
 
-sam local invoke -e events/event.json CloudProjectMakerFunction
+sam local invoke -e events/event.json CloudProjectMarkerFunction
