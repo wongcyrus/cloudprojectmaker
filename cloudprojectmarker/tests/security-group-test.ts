@@ -9,11 +9,19 @@ describe("Security Group", () => {
   let studentData: GraderEvent;
   const ec2: AWS.EC2 = new AWS.EC2();
   const getSgByName = async (groupName: string): Promise<EC2.SecurityGroup> => {
-    let params = {
+        let params: EC2.Types.DescribeVpcsRequest = {
+      Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
+    };
+        const vpcs: EC2.Types.DescribeVpcsResult = await ec2
+      .describeVpcs(params)
+      .promise();
+
+
+    params = {
       Filters: [
         {
           Name: "vpc-id",
-          Values: [studentData.vpcId],
+          Values: [vpcs.Vpcs![0].VpcId!],
         },
         {
           Name: "group-name",

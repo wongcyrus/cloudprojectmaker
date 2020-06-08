@@ -1,14 +1,15 @@
-import * as AWS from "aws-sdk";
 import * as fs from "fs";
 import * as path from "path";
 
+const AWS = require('aws-sdk');
+
 export interface GraderEvent {
-  vpcId: string;
-  eventBool: boolean;
+  aws_access_key?: string;
+  aws_secret_access_key?: string;
+  aws_session_token?: string;
 }
 interface GraderResult {
-  resultString: string;
-  resultBool?: boolean;
+  testResult: string;
 }
 
 export const lambdaHandler = async (
@@ -23,7 +24,16 @@ export const lambdaHandler = async (
   const mocha = new Mocha();
 
   var testDir = "tests/";
-
+  
+  if(event.aws_access_key){
+    console.log("Cross Account");
+    AWS.config.update({
+      accessKeyId: event.aws_access_key, 
+      secretAccessKey: event.aws_secret_access_key,
+      sessionToken:  event.aws_session_token,
+      region: 'us-east-1'});
+  }
+  
   // Add each .js file to the mocha instance
   fs.readdirSync(testDir)
     .filter((file: any) => {
@@ -50,7 +60,6 @@ export const lambdaHandler = async (
   var data = fs.readFileSync("/tmp/testspec.xunit.xml", "utf8");
   console.log(data);
   return {
-    resultBool: true,
-    resultString: `Queries`,
+    testResult: data,
   };
 };
