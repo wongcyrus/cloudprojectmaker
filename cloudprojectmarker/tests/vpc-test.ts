@@ -6,16 +6,10 @@ import { GraderEvent } from "./../app";
 import { EC2 } from "aws-sdk";
 
 describe("VPC", () => {
-  let studentData: GraderEvent;
-  before(() => {
-    studentData = JSON.parse(process.env.studentData!);
-  });
-
+  const ec2: AWS.EC2 = new AWS.EC2();
   it("should be with cidr 10.0.0.0/16.", async () => {
-    const ec2: AWS.EC2 = new AWS.EC2();
-
     let params: EC2.Types.DescribeVpcsRequest = {
-      VpcIds: [studentData.vpcId],
+      Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
     };
     const vpcs: EC2.Types.DescribeVpcsResult = await ec2
       .describeVpcs(params)
@@ -28,13 +22,18 @@ describe("VPC", () => {
   });
 
   it("should be with 6 subnets with proper Cidr address.", async () => {
-    const ec2: AWS.EC2 = new AWS.EC2();
+    let params: EC2.Types.DescribeVpcsRequest = {
+      Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
+    };
+    const vpcs: EC2.Types.DescribeVpcsResult = await ec2
+      .describeVpcs(params)
+      .promise();
 
-    let params = {
+    params = {
       Filters: [
         {
           Name: "vpc-id",
-          Values: [studentData.vpcId],
+          Values: [vpcs.Vpcs![0].VpcId!],
         },
       ],
     };
@@ -58,13 +57,18 @@ describe("VPC", () => {
     );
   });
   it("should be with 7 route tables for 6 subnets plus one local route only main route table.", async () => {
-    const ec2: AWS.EC2 = new AWS.EC2();
+    let params: EC2.Types.DescribeVpcsRequest = {
+      Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
+    };
+    const vpcs: EC2.Types.DescribeVpcsResult = await ec2
+      .describeVpcs(params)
+      .promise();
 
-    let params = {
+    params = {
       Filters: [
         {
           Name: "vpc-id",
-          Values: [studentData.vpcId],
+          Values: [vpcs.Vpcs![0].VpcId!],
         },
       ],
     };

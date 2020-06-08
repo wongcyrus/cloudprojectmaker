@@ -2,17 +2,11 @@ import { expect } from "chai";
 // if you used the '@types/mocha' method to install mocha type definitions, uncomment the following line
 import "mocha";
 import * as AWS from "aws-sdk";
-import { GraderEvent } from "./../app";
 import { SQS, SNS } from "aws-sdk";
 
 describe("SQS and SNS", () => {
-  let studentData: GraderEvent;
   const sqs: AWS.SQS = new AWS.SQS();
   const sns: AWS.SNS = new AWS.SNS();
-
-  before(async () => {
-    studentData = JSON.parse(process.env.studentData!);
-  });
 
   it("should have 2 SQS queues. ", async () => {
     const errorQueue = await sqs
