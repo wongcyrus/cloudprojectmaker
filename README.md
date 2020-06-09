@@ -2,11 +2,17 @@
 
 ## Deploy the grader lambda.
 git clone https://github.com/wongcyrus/cloud-project-marker
+
 .\build-layer.sh
+
 cd cloudprojectmarker/
+
 npm i && npm run build
+
 cd ..
+
 sam build && sam deploy
+
 
 ## Run Lambda Local in the current AWS Account.
 sam local invoke CloudProjectMarkerFunction
