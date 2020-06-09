@@ -42,6 +42,7 @@ Resources:
       Runtime: nodejs12.x
       Policies:
         - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess
       Layers:
         - !Ref LibLayer        
 

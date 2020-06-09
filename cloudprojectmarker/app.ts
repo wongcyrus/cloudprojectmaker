@@ -21,10 +21,7 @@ export const lambdaHandler = async (
   const path = require("path");
 
   const mocha = new Mocha({
-        reporter: 'json',
-        reporterOptions: {
-            output: '/tmp/report.json'
-        }
+        reporter: 'json'
     });
 
   const testDir = "marking/";
@@ -45,6 +42,10 @@ export const lambdaHandler = async (
       return file.substr(-3) === ".js";
     })
     .forEach((file: any) => {
+      //https://github.com/mochajs/mocha/issues/2783
+      let _sPathSpec = path.join(path.resolve(), testDir, file);
+      // Resetting caches to be able to launch tests multiple times...
+      delete require.cache[_sPathSpec];
       mocha.addFile(path.join(testDir, file));
     });
 
