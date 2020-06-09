@@ -3,7 +3,11 @@
 ## Deploy the grader lambda.
 git clone https://github.com/wongcyrus/cloud-project-marker
 
-Open samconfig.toml and check the bucket name in us-east-1.
+Open samconfig.toml and change the bucket name in us-east-1.
+
+s3_bucket = "XXXXXXX"
+
+Run 2 commands
 
 cd cloud-project-marker/
 
