@@ -50,7 +50,7 @@ export const lambdaHandler = async (
 
   process.env.studentData = JSON.stringify(event);
 
-  const waitForTest = () =>
+  const waitForTest = async () =>
     new Promise((resolve) => {
       let runner = mocha
         .run((failures: number) => {

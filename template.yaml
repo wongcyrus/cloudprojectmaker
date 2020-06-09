@@ -40,6 +40,12 @@ Resources:
       CodeUri: cloudprojectmarker/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
+      Policies:
+        - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
       Layers:
         - !Ref LibLayer        
 
+Outputs:
+  CloudProjectMarkerFunction:
+    Description: "CloudProjectMarkerFunction"
+    Value: !GetAtt CloudProjectMarkerFunction.Arn
