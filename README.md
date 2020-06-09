@@ -3,6 +3,10 @@
 ## Deploy the grader lambda.
 git clone https://github.com/wongcyrus/cloud-project-marker
 
+Open samconfig.toml and check the bucket name in us-east-1.
+
+cd cloud-project-marker
+
 .\build-layer.sh
 
 cd cloudprojectmarker/
