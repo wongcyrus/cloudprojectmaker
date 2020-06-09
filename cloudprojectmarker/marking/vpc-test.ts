@@ -2,7 +2,6 @@ import { expect } from "chai";
 // if you used the '@types/mocha' method to install mocha type definitions, uncomment the following line
 import "mocha";
 import * as AWS from "aws-sdk";
-import { GraderEvent } from "./../app";
 import { EC2 } from "aws-sdk";
 
 describe("VPC", () => {

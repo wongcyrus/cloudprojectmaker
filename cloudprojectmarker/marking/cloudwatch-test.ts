@@ -8,7 +8,7 @@ describe("CloudWatch", () => {
   const cloudWatch: AWS.CloudWatch = new AWS.CloudWatch();
   const sns: AWS.SNS = new AWS.SNS();
 
-  it("should have custom metric. ", async () => {
+  it("should have custom metric.", async () => {
     const errorMessageCount = await cloudWatch
       .listMetrics({
         MetricName: "error-message-count",
@@ -32,7 +32,4 @@ describe("CloudWatch", () => {
     // ).to.equal(1);
   });
 
-  it("To_Be_Processed_Queue should have 300 seconds VisibilityTimeout. ", async () => {});
-
-  it("should have Error Topic with Error_Queue subscription. ", async () => {});
 });

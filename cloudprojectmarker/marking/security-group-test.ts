@@ -2,11 +2,9 @@ import { expect } from "chai";
 // if you used the '@types/mocha' method to install mocha type definitions, uncomment the following line
 import "mocha";
 import * as AWS from "aws-sdk";
-import { GraderEvent } from "./../app";
 import { EC2 } from "aws-sdk";
 
 describe("Security Group", () => {
-  let studentData: GraderEvent;
   const ec2: AWS.EC2 = new AWS.EC2();
   const getSgByName = async (groupName: string): Promise<EC2.SecurityGroup> => {
         let params: EC2.Types.DescribeVpcsRequest = {
@@ -47,7 +45,6 @@ describe("Security Group", () => {
   let dbSg: EC2.SecurityGroup;
 
   before(async () => {
-    studentData = JSON.parse(process.env.studentData!);
     albSg = await getSgByName("ALB Security Group");
     lambdaSg = await getSgByName("Lambda Security Group");
     dbSg = await getSgByName("Database Security Group");

@@ -9,21 +9,20 @@
   "dependencies": {
     "@types/aws-lambda": "^8.10.51",
     "@types/node": "^14.0.5",
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
     "aws-sdk": "^2.684.0",
-    "ts-node": "^8.10.1",
-    "typescript": "^3.9.3",
     "chai": "^4.2.0",
-    "mocha": "^6.2.3"
+    "mocha": "^6.2.3",
+    "jest": "^26.0.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.3"
   },
   "scripts": {
+    "install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "mocha tests/unit/"
   },
-  "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0",
-    "mocha": "^6.2.3"
-  }
+  "devDependencies": {}
 }
