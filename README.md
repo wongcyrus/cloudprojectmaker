@@ -5,17 +5,7 @@ git clone https://github.com/wongcyrus/cloud-project-marker
 
 Open samconfig.toml and check the bucket name in us-east-1.
 
-cd cloud-project-marker
-
-.\build-layer.sh
-
-cd cloudprojectmarker/
-
-npm i && npm run build
-
-cd ..
-
-sam build && sam deploy
+.\deployment.sh
 
 
 ## Run Lambda Local in the current AWS Account.
