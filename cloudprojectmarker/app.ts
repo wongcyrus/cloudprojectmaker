@@ -1,5 +1,4 @@
-import * as fs from "fs";
-import * as path from "path";
+import { Runner } from "mocha";
 
 const AWS = require('aws-sdk');
 
@@ -21,7 +20,12 @@ export const lambdaHandler = async (
   const fs = require("fs");
   const path = require("path");
 
-  const mocha = new Mocha();
+  const mocha = new Mocha({
+        reporter: 'json',
+        reporterOptions: {
+            output: '/tmp/report.json'
+        }
+    });
 
   const testDir = "marking/";
   
@@ -48,18 +52,15 @@ export const lambdaHandler = async (
 
   const waitForTest = () =>
     new Promise((resolve) => {
-      mocha
-        .reporter("xunit", { output: "/tmp/testspec.xunit.xml" })
-        .ui("tdd")
+      let runner = mocha
         .run((failures: number) => {
-          resolve(failures);
+          console.log(failures);
+          resolve(runner);
         });
     });
 
-  await waitForTest();
-  const data = fs.readFileSync("/tmp/testspec.xunit.xml", "utf8");
-  console.log(data);
+  let runner:any = await waitForTest();
   return {
-    testResult: data,
+    testResult: JSON.stringify(runner.testResults),
   };
 };
