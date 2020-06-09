@@ -3,7 +3,8 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "cloudprojectmarker"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-17ym81j7c4d2c"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1mhzjm1gn6clf"
 s3_prefix = "cloudprojectmarker"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"
+

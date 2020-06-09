@@ -5,7 +5,20 @@ Description: >
 
   Sample SAM Template for cloudprojectmaker
   
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: cloud-project-maker
+    Description: >
+      Lambda Function to grade the cloud project assignment.
+    Author: Cyrus Wong
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: LICENSE.txt
+    ReadmeUrl: README.md
+    Labels: ['lambda','AWS_Educate']
+    HomePageUrl: https://github.com/wongcyrus/managed-aws-educate-classroom
+    SemanticVersion: 0.0.2
+    SourceCodeUrl: https://github.com/wongcyrus/managed-aws-educate-classroom
+
 Globals:
   Function:
     Timeout: 60

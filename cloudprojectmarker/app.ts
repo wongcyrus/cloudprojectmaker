@@ -23,7 +23,7 @@ export const lambdaHandler = async (
 
   const mocha = new Mocha();
 
-  var testDir = "tests/";
+  const testDir = "marking/";
   
   if(event.aws_access_key){
     console.log("Cross Account");
@@ -57,7 +57,7 @@ export const lambdaHandler = async (
     });
 
   await waitForTest();
-  var data = fs.readFileSync("/tmp/testspec.xunit.xml", "utf8");
+  const data = fs.readFileSync("/tmp/testspec.xunit.xml", "utf8");
   console.log(data);
   return {
     testResult: data,

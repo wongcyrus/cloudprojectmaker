@@ -6,3 +6,6 @@
 # Parcel build directories
 .cache
 .build
+
+.aws-sam/
+events/event.json
