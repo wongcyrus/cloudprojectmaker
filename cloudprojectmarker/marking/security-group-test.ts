@@ -7,13 +7,12 @@ import { EC2 } from "aws-sdk";
 describe("Security Group", () => {
   const ec2: AWS.EC2 = new AWS.EC2();
   const getSgByName = async (groupName: string): Promise<EC2.SecurityGroup> => {
-        let params: EC2.Types.DescribeVpcsRequest = {
+    let params: EC2.Types.DescribeVpcsRequest = {
       Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
     };
-        const vpcs: EC2.Types.DescribeVpcsResult = await ec2
+    const vpcs: EC2.Types.DescribeVpcsResult = await ec2
       .describeVpcs(params)
       .promise();
-
 
     params = {
       Filters: [
@@ -53,57 +52,49 @@ describe("Security Group", () => {
   it("for ALB should set properly. ", async () => {
     // printSg(albSg);
 
-    expect(
-      albSg.IpPermissions!.length,
-      "ALB with only 1 ingress rule"
-    ).to.equal(1);
+    expect(1, "ALB with only 1 ingress rule").to.equal(
+      albSg.IpPermissions!.length
+    );
 
-    expect(
-      albSg.IpPermissions![0].IpRanges![0].CidrIp,
-      "ALB with ingress rule from anywhere."
-    ).to.equal("0.0.0.0/0");
+    expect("0.0.0.0/0", "ALB with ingress rule from anywhere.").to.equal(
+      albSg.IpPermissions![0].IpRanges![0].CidrIp
+    );
 
-    expect(
-      albSg.IpPermissions![0].ToPort,
-      "ALB with ingress rule for port 80."
-    ).to.equal(80);
+    expect(80, "ALB with ingress rule for port 80.").to.equal(
+      albSg.IpPermissions![0].ToPort
+    );
 
-    expect(
-      albSg.IpPermissionsEgress!.length,
-      "ALB with only 1 Egress rule"
-    ).to.equal(1);
+    expect(1, "ALB with only 1 Egress rule").to.equal(
+      albSg.IpPermissionsEgress!.length
+    );
 
-    expect(
-      albSg.IpPermissionsEgress![0].UserIdGroupPairs![0].GroupId,
-      "ALB with Egress rule to Lambda only."
-    ).to.equal(lambdaSg.GroupId);
+    expect(lambdaSg.GroupId, "ALB with Egress rule to Lambda only.").to.equal(
+      albSg.IpPermissionsEgress![0].UserIdGroupPairs![0].GroupId
+    );
   });
 
   it("for Lambda should set properly. ", async () => {
     // printSg(lambdaSg);
 
-    expect(
-      lambdaSg.IpPermissions!.length,
-      "Lambda with only 1 ingress rule"
-    ).to.equal(1);
+    expect(1, "Lambda with only 1 ingress rule").to.equal(
+      lambdaSg.IpPermissions!.length
+    );
 
-    expect(
-      lambdaSg.IpPermissions![0].UserIdGroupPairs![0].GroupId,
-      "Lambda with ingress rule from ALB."
-    ).to.equal(albSg.GroupId);
+    expect(albSg.GroupId, "Lambda with ingress rule from ALB.").to.equal(
+      lambdaSg.IpPermissions![0].UserIdGroupPairs![0].GroupId
+    );
   });
 
   it("for Database should set properly. ", async () => {
     // printSg(dbSg);
 
-    expect(
-      dbSg.IpPermissions!.length,
-      "Database with only 1 ingress rule"
-    ).to.equal(1);
+    expect(1, "Database with only 1 ingress rule").to.equal(
+      dbSg.IpPermissions!.length
+    );
 
     expect(
-      dbSg.IpPermissions![0].UserIdGroupPairs![0].GroupId,
+      lambdaSg.GroupId,
       "Database with ingress rule from Lambda."
-    ).to.equal(lambdaSg.GroupId);
+    ).to.equal(dbSg.IpPermissions![0].UserIdGroupPairs![0].GroupId);
   });
 });

@@ -20,7 +20,7 @@ describe("VPC", () => {
     expect(vpcs.Vpcs![0].CidrBlock).to.equal("10.0.0.0/16");
   });
 
-  it("should be with 6 subnets with proper Cidr address.", async () => {
+  it("should be with 4 subnets with proper Cidr address.", async () => {
     let params: EC2.Types.DescribeVpcsRequest = {
       Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
     };
@@ -40,22 +40,20 @@ describe("VPC", () => {
       .describeSubnets(params)
       .promise();
     // console.log(subnets.Subnets!);
-    // console.log(subnets.Subnets!.map((c) => c.CidrBlock).sort());
+    console.log(subnets.Subnets!.map((c) => c.CidrBlock).sort());
 
-    expect(subnets.Subnets!.length).to.equal(6);
+    expect(4).to.equal(subnets.Subnets!.length);
     let expectedCidrAddresses = [
       "10.0.0.0/24",
       "10.0.1.0/24",
-      "10.0.12.0/22",
-      "10.0.2.0/24",
       "10.0.4.0/22",
       "10.0.8.0/22",
     ];
-    expect(subnets.Subnets!.map((c) => c.CidrBlock).sort()).to.deep.equal(
-      expectedCidrAddresses
+    expect(expectedCidrAddresses).to.deep.equal(
+      subnets.Subnets!.map((c) => c.CidrBlock).sort()
     );
   });
-  it("should be with 7 route tables for 6 subnets plus one local route only main route table.", async () => {
+  it("should be with 5 route tables for 4 subnets plus one local route only main route table.", async () => {
     let params: EC2.Types.DescribeVpcsRequest = {
       Filters: [{ Name: "tag:Name", Values: ["Cloud Project VPC"] }],
     };
@@ -75,7 +73,7 @@ describe("VPC", () => {
       .describeRouteTables(params)
       .promise();
 
-    expect(routeTables.RouteTables!.length, "7 subnets").to.equal(7);
+    expect(5, "5 RouteTables").to.equal(routeTables.RouteTables!.length);
 
     const firstRoute = routeTables
       .RouteTables!.filter((c) => c.Routes!.length > 1)
@@ -86,13 +84,11 @@ describe("VPC", () => {
     const numberOfS3VpcGatewayEndpointRoutes = firstRoute.filter((c) =>
       c.GatewayId!.startsWith("vpce")
     ).length;
-    expect(
-      numberOfInternetGatawayRoutes,
-      "3 route tables with public route."
-    ).to.equal(3);
-    expect(
-      numberOfS3VpcGatewayEndpointRoutes,
-      "3 route table with S3 VPC Endpoint route."
-    ).to.equal(3);
+    expect(2, "2 route tables with public route.").to.equal(
+      numberOfInternetGatawayRoutes
+    );
+    expect(2, "2 route table with S3 VPC Endpoint route.").to.equal(
+      numberOfS3VpcGatewayEndpointRoutes
+    );
   });
 });

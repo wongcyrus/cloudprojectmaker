@@ -17,11 +17,10 @@ describe("SQS and SNS", () => {
         QueueNamePrefix: "To_Be_Processed_Queue",
       })
       .promise();
-    expect(errorQueue.QueueUrls!.length, "Error_Queue exist.").to.equal(1);
-    expect(
-      processQueue.QueueUrls!.length,
-      "To_Be_Processed_Queue exist."
-    ).to.equal(1);
+    expect(1, "Error_Queue exist.").to.equal(errorQueue.QueueUrls!.length);
+    expect(1, "To_Be_Processed_Queue exist.").to.equal(
+      processQueue.QueueUrls!.length
+    );
   });
 
   it("To_Be_Processed_Queue should have 300 seconds VisibilityTimeout. ", async () => {
@@ -43,9 +42,9 @@ describe("SQS and SNS", () => {
     const visibilityTimeout: number = +processQueueAttributes!.Attributes!
       .VisibilityTimeout;
     expect(
-      visibilityTimeout,
+      300,
       "To_Be_Processed_Queue 300 seconds VisibilityTimeout."
-    ).to.equal(300);
+    ).to.equal(visibilityTimeout);
   });
 
   it("should have Error Topic with Error_Queue subscription. ", async () => {
