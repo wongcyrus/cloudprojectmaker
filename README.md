@@ -18,7 +18,10 @@ cd cloud-project-marker/
 sam local invoke CloudProjectMarkerFunction
 
 ## Run Lambda Local in the other AWS Account.
-sam local invoke -e events/event.json CloudProjectMarkerFunction
+am local invoke -e events/event.json CloudProjectMarkerFunction
+
+## During test case development, Run SAM Build and Lambda Local in the other AWS Account.
+sam build && sam local invoke -e events/event.json CloudProjectMarkerFunction
 
 ## Run the Lambda
 CloudProjectMarkerFunction=$(aws cloudformation describe-stacks --stack-name cloudprojectmarker \

@@ -40,7 +40,7 @@ describe("VPC", () => {
       .describeSubnets(params)
       .promise();
     // console.log(subnets.Subnets!);
-    console.log(subnets.Subnets!.map((c) => c.CidrBlock).sort());
+    //console.log(subnets.Subnets!.map((c) => c.CidrBlock).sort());
 
     expect(4).to.equal(subnets.Subnets!.length);
     let expectedCidrAddresses = [
