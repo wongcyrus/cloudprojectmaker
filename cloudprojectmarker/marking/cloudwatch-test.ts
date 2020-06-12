@@ -91,10 +91,7 @@ describe("CloudWatch", () => {
 
     //console.log(errorTermsAlarms.MetricAlarms![0]);
 
-    expect(
-      errorTermsAlarms.MetricAlarms![0],
-      "counts on number of error messages per 1 mins with proper settings."
-    ).to.containSubset({
+    const expected = {
       AlarmName: "alarms-batchProcessErrors",
       ActionsEnabled: true,
       OKActions: [],
@@ -109,7 +106,11 @@ describe("CloudWatch", () => {
       ComparisonOperator: "GreaterThanThreshold",
       TreatMissingData: "missing",
       Metrics: [],
-    });
+    };
+    expect(
+      errorTermsAlarms.MetricAlarms![0],
+      "counts on number of error messages per 1 mins with proper settings."
+    ).to.containSubset(expected);
     expect(
       errorTermsAlarms.MetricAlarms![0].AlarmActions![0],
       "Action to the Error topic"

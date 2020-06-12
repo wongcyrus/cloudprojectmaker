@@ -1,6 +1,6 @@
 import { Runner } from "mocha";
 
-const AWS = require('aws-sdk');
+const AWS = require("aws-sdk");
 
 export interface GraderEvent {
   aws_access_key?: string;
@@ -21,25 +21,26 @@ export const lambdaHandler = async (
   const path = require("path");
 
   const mocha = new Mocha({
-        reporter: 'json'
-    });
+    reporter: "json",
+  });
 
   const testDir = "marking/";
-  
-  if(event.aws_access_key){
+
+  if (event.aws_access_key) {
     console.log("Cross Account");
     AWS.config.update({
-      accessKeyId: event.aws_access_key, 
+      accessKeyId: event.aws_access_key,
       secretAccessKey: event.aws_secret_access_key,
-      sessionToken:  event.aws_session_token,
-      region: 'us-east-1'});
+      sessionToken: event.aws_session_token,
+      region: "us-east-1",
+    });
   }
-  
+
   // Add each .js file to the mocha instance
   fs.readdirSync(testDir)
     .filter((file: any) => {
-      // Only keep the .js files
-      return file.substr(-3) === ".js";
+      // Only keep the -test.js files
+      return file.substr(-8) === "-test.js";
     })
     .forEach((file: any) => {
       //https://github.com/mochajs/mocha/issues/2783
@@ -53,14 +54,13 @@ export const lambdaHandler = async (
 
   const waitForTest = async () =>
     new Promise((resolve) => {
-      let runner = mocha
-        .run((failures: number) => {
-          console.log(failures);
-          resolve(runner);
-        });
+      let runner = mocha.run((failures: number) => {
+        console.log(failures);
+        resolve(runner);
+      });
     });
 
-  let runner:any = await waitForTest();
+  let runner: any = await waitForTest();
   return {
     testResult: JSON.stringify(runner.testResults),
   };
