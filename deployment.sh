@@ -1,5 +1,4 @@
 #!/bin/bash
-cd cloud-project-marker
 ./build-layer.sh
 cd cloudprojectmarker/
 npm i && npm run build
