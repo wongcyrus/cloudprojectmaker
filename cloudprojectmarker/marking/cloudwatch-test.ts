@@ -11,7 +11,6 @@ chai.use(chaiSubset);
 describe("CloudWatch", () => {
   const cloudWatch: AWS.CloudWatch = new AWS.CloudWatch();
   const cloudWatchLogs: AWS.CloudWatchLogs = new AWS.CloudWatchLogs();
-  const sns: AWS.SNS = new AWS.SNS();
 
   it("should have batchprocesslog log group with 1 Metric Filter.", async () => {
     const batchprocesslogGroups = await cloudWatchLogs

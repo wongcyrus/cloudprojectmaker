@@ -18,10 +18,20 @@ Metadata:
     HomePageUrl: https://github.com/wongcyrus/managed-aws-educate-classroom
     SemanticVersion: 0.0.2
     SourceCodeUrl: https://github.com/wongcyrus/managed-aws-educate-classroom
-
+    
+Parameters:
+  RecaptchaSiteKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+  RecaptchaSercetKey:
+    Type: String
+    Default: ""
+    NoEcho: true    
 Globals:
   Function:
-    Timeout: 60
+    Timeout: 120
+    Runtime: nodejs12.x
 
 Resources:
 
@@ -39,14 +49,41 @@ Resources:
     Properties:
       CodeUri: cloudprojectmarker/
       Handler: app.lambdaHandler
-      Runtime: nodejs12.x
       Policies:
         - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess
       Layers:
         - !Ref LibLayer        
 
+# WebUI for student registration.
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    
+  CheckMarkWebUiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: web-ui/
+      Handler: checkMark.lambdaHandler
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CloudProjectMarkerFunction
+      Environment:
+        Variables:
+          CloudProjectMarkerFunction: !GetAtt CloudProjectMarkerFunction.Arn
+          RecaptchaSiteKey: !Ref RecaptchaSiteKey
+          RecaptchaSercetKey: !Ref RecaptchaSercetKey
+      Events:
+        ExplicitApi:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Method: ANY
+            Path: /
 Outputs:
   CloudProjectMarkerFunction:
     Description: "CloudProjectMarkerFunction"
     Value: !GetAtt CloudProjectMarkerFunction.Arn
+  CheckMarkWebUiUrl:
+    Description: URL for teacher to get the assume role URL for your student account.
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'    
+    
