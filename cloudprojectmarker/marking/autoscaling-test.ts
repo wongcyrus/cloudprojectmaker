@@ -7,13 +7,12 @@ import * as chai from "chai";
 import * as chaiSubset from "chai-subset";
 chai.use(chaiSubset);
 
-import { STS, SNS, EC2 } from "aws-sdk";
-
 describe("AutoScaling", () => {
   const sqs: AWS.SQS = new AWS.SQS();
   const autoScaling: AWS.AutoScaling = new AWS.AutoScaling();
   const iam: AWS.IAM = new AWS.IAM();
   const sts: AWS.STS = new AWS.STS();
+  const cloudWatch: AWS.CloudWatch = new AWS.CloudWatch();
 
   it("should set properly.", async () => {
     const autoScalingGroups = await autoScaling
@@ -205,5 +204,147 @@ done
       expected.replace(/\n/g, "").replace(/\s/g, ""),
       "permission for log group, and SQS."
     ).to.equal(inlinePolicyDcoument);
+  });
+
+  it("should have 2 Step Scaling Polices.", async () => {
+    const autoScalingGroups = await autoScaling
+      .describePolicies({
+        AutoScalingGroupName: "SqsAutoScalingGroup",
+      })
+      .promise();
+    console.log(autoScalingGroups.ScalingPolicies);
+    expect(2, "2 Scaling Polices").to.equal(
+      autoScalingGroups.ScalingPolicies!.length
+    );
+
+    const lowCapacityPolicy = autoScalingGroups.ScalingPolicies!.find(
+      (c) => c.StepAdjustments!.length === 1
+    );
+
+    // console.log(lowCapacityPolicy);
+    expect(
+      { MetricIntervalUpperBound: 0, ScalingAdjustment: -1 },
+      "One down step"
+    ).to.deep.eq(lowCapacityPolicy!.StepAdjustments![0]);
+    const highCapacityPolicy = autoScalingGroups.ScalingPolicies!.find(
+      (c) => c.StepAdjustments!.length === 3
+    );
+
+    expect(lowCapacityPolicy!.AdjustmentType, "AdjustmentType").to.equal(
+      "ChangeInCapacity"
+    );
+    expect(
+      lowCapacityPolicy!.MetricAggregationType,
+      "MetricAggregationType"
+    ).to.equal("Average");
+
+    //console.log(highCapacityPolicy);
+    expect(
+      [
+        {
+          MetricIntervalLowerBound: 0,
+          MetricIntervalUpperBound: 10,
+          ScalingAdjustment: 1,
+        },
+        {
+          MetricIntervalLowerBound: 10,
+          MetricIntervalUpperBound: 20,
+          ScalingAdjustment: 3,
+        },
+        { MetricIntervalLowerBound: 20, ScalingAdjustment: 5 },
+      ],
+      "Three up steps"
+    ).to.deep.eq(highCapacityPolicy!.StepAdjustments!);
+    expect(highCapacityPolicy!.AdjustmentType, "AdjustmentType").to.equal(
+      "ChangeInCapacity"
+    );
+    expect(
+      highCapacityPolicy!.MetricAggregationType,
+      "MetricAggregationType"
+    ).to.equal("Average");
+  });
+
+  it("should have 2 Alarms for To_Be_Processed_Queue.", async () => {
+    const autoScalingGroups = await autoScaling
+      .describePolicies({
+        AutoScalingGroupName: "SqsAutoScalingGroup",
+      })
+      .promise();
+    console.log(autoScalingGroups.ScalingPolicies);
+    expect(2, "2 Scaling Polices").to.equal(
+      autoScalingGroups.ScalingPolicies!.length
+    );
+
+    const lowCapacityPolicy = autoScalingGroups.ScalingPolicies!.find(
+      (c) => c.StepAdjustments!.length === 1
+    );
+
+    const highCapacityPolicy = autoScalingGroups.ScalingPolicies!.find(
+      (c) => c.StepAdjustments!.length === 3
+    );
+
+    const lowCapacityAlarm = await cloudWatch
+      .describeAlarms({
+        AlarmNames: [lowCapacityPolicy!.Alarms![0].AlarmName!],
+      })
+      .promise();
+
+    const lowCapacityMetricAlarm = lowCapacityAlarm.MetricAlarms![0];
+    // console.log(lowCapacityMetricAlarm);
+
+    let expected = {
+      ActionsEnabled: true,
+      OKActions: [],
+      AlarmActions: [lowCapacityPolicy!.PolicyARN!],
+      InsufficientDataActions: [],
+      StateValue: "ALARM",
+      MetricName: "ApproximateNumberOfMessagesVisible",
+      Namespace: "AWS/SQS",
+      Statistic: "Average",
+      Dimensions: [{ Name: "QueueName", Value: "To_Be_Processed_Queue" }],
+      Period: 60,
+      EvaluationPeriods: 1,
+      Threshold: 0,
+      ComparisonOperator: "LessThanOrEqualToThreshold",
+      Metrics: [],
+    };
+
+    expect(
+      lowCapacityMetricAlarm,
+      "alarm for To_Be_Processed_Queue."
+    ).to.containSubset(expected);
+
+    //console.log(highCapacityPolicy);
+
+    const highCapacityAlarm = await cloudWatch
+      .describeAlarms({
+        AlarmNames: [highCapacityPolicy!.Alarms![0].AlarmName!],
+      })
+      .promise();
+
+    const highCapacityMetricAlarm = highCapacityAlarm.MetricAlarms![0];
+    //console.log(highCapacityMetricAlarm);
+
+    expected = {
+      ActionsEnabled: true,
+      OKActions: [],
+      AlarmActions: [highCapacityPolicy!.PolicyARN!],
+      InsufficientDataActions: [],
+      StateValue: "OK",
+      MetricName: "ApproximateNumberOfMessagesVisible",
+      Namespace: "AWS/SQS",
+      Statistic: "Average",
+      Dimensions: [{ Name: "QueueName", Value: "To_Be_Processed_Queue" }],
+      Period: 60,
+      EvaluationPeriods: 1,
+      Threshold: 10,
+      ComparisonOperator: "GreaterThanOrEqualToThreshold",
+      Metrics: [],
+    };
+
+    expect(
+      highCapacityMetricAlarm,
+      "alarm for To_Be_Processed_Queue."
+    ).to.containSubset(expected);
   });
 });
