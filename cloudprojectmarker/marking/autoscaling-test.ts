@@ -203,7 +203,7 @@ done
     expect(
       expected.replace(/\n/g, "").replace(/\s/g, ""),
       "permission for log group, and SQS."
-    ).to.equal(inlinePolicyDcoument);
+    ).to.equal(inlinePolicyDcoument.replace(/\n/g, "").replace(/\s/g, ""));
   });
 
   it("should have 2 Step Scaling Polices.", async () => {
@@ -212,7 +212,7 @@ done
         AutoScalingGroupName: "SqsAutoScalingGroup",
       })
       .promise();
-    console.log(autoScalingGroups.ScalingPolicies);
+    // console.log(autoScalingGroups.ScalingPolicies);
     expect(2, "2 Scaling Polices").to.equal(
       autoScalingGroups.ScalingPolicies!.length
     );
@@ -270,7 +270,7 @@ done
         AutoScalingGroupName: "SqsAutoScalingGroup",
       })
       .promise();
-    console.log(autoScalingGroups.ScalingPolicies);
+    // console.log(autoScalingGroups.ScalingPolicies);
     expect(2, "2 Scaling Polices").to.equal(
       autoScalingGroups.ScalingPolicies!.length
     );
