@@ -118,8 +118,8 @@ describe("Lambda", () => {
       "uses 2 subnets in different AZ"
     ).to.not.eq(subnets.Subnets![1].AvailabilityZone);
 
-    expect(subnets.Subnets![0].CidrBlock!, "private subnet.").to.contain("/22");
-    expect(subnets.Subnets![1].CidrBlock!, "private subnet.").to.contain("/22");
+    expect(subnets.Subnets![0].CidrBlock!, "private subnet.").to.endWith("/22");
+    expect(subnets.Subnets![1].CidrBlock!, "private subnet.").to.endWith("/22");
 
     expect(1, "1 Security Group.").to.eq(
       lambdaFunction.Configuration!.VpcConfig!.SecurityGroupIds!.length

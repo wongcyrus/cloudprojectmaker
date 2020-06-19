@@ -49,6 +49,7 @@ export const lambdaHandler = async (
       delete require.cache[_sPathSpec];
       mocha.addFile(path.join(testDir, file));
     });
+  // mocha.addFile(path.join(testDir, "alb-test.js"));
 
   process.env.studentData = JSON.stringify(event);
 
