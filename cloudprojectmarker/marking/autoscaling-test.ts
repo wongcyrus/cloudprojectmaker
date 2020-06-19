@@ -2,6 +2,7 @@ import { expect } from "chai";
 // if you used the '@types/mocha' method to install mocha type definitions, uncomment the following line
 import "mocha";
 import * as AWS from "aws-sdk";
+import { Common } from "./common";
 
 import * as chai from "chai";
 import * as chaiSubset from "chai-subset";
@@ -11,8 +12,8 @@ describe("AutoScaling", () => {
   const sqs: AWS.SQS = new AWS.SQS();
   const autoScaling: AWS.AutoScaling = new AWS.AutoScaling();
   const iam: AWS.IAM = new AWS.IAM();
-  const sts: AWS.STS = new AWS.STS();
   const cloudWatch: AWS.CloudWatch = new AWS.CloudWatch();
+  const common = new Common();
 
   it("should set properly.", async () => {
     const autoScalingGroups = await autoScaling
@@ -191,19 +192,20 @@ done
       })
       .promise();
 
-    const callerId = await sts.getCallerIdentity().promise();
-    const awsAccountId = callerId.Account!;
-    const inlinePolicyDcoument = decodeURIComponent(policy.PolicyDocument);
+    const awsAccountId = await common.getAWSAccount();
+    const inlinePolicyDcoument = JSON.parse(
+      decodeURIComponent(policy.PolicyDocument)
+    );
     // console.log(inlinePolicyDcoument);
     expected = `{"Version":"2012-10-17",
     "Statement":[
     {"Action":["logs:CreateLogStream","logs:PutLogEvents"],"Resource":"arn:aws:logs:us-east-1:${awsAccountId}:log-group:/cloudproject/batchprocesslog:*","Effect":"Allow"},
     {"Action":"logs:DescribeLogStreams","Resource":"arn:aws:logs:us-east-1:${awsAccountId}:log-group:/cloudproject/batchprocesslog:*","Effect":"Allow"},
     {"Action":["sqs:ReceiveMessage","sqs:ChangeMessageVisibility","sqs:GetQueueUrl","sqs:DeleteMessage","sqs:GetQueueAttributes"],"Resource":"arn:aws:sqs:us-east-1:${awsAccountId}:To_Be_Processed_Queue","Effect":"Allow"}]}`;
-    expect(
-      expected.replace(/\n/g, "").replace(/\s/g, ""),
-      "permission for log group, and SQS."
-    ).to.equal(inlinePolicyDcoument.replace(/\n/g, "").replace(/\s/g, ""));
+    expected = JSON.parse(expected);
+    expect(expected, "permission for log group, and SQS.").to.deep.equal(
+      inlinePolicyDcoument
+    );
   });
 
   it("should have 2 Step Scaling Polices.", async () => {
@@ -309,9 +311,10 @@ done
       Metrics: [],
     };
 
+    // console.log(expected);
     expect(
       lowCapacityMetricAlarm,
-      "alarm for To_Be_Processed_Queue."
+      "Low Capacity alarm for To_Be_Processed_Queue."
     ).to.containSubset(expected);
 
     //console.log(highCapacityPolicy);
@@ -344,7 +347,7 @@ done
 
     expect(
       highCapacityMetricAlarm,
-      "alarm for To_Be_Processed_Queue."
+      "High Capacity alarm for To_Be_Processed_Queue."
     ).to.containSubset(expected);
   });
 });

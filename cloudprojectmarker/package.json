@@ -7,6 +7,8 @@
   "author": "SAM CLI",
   "license": "MIT",
   "dependencies": {
+    "@types/chai-string": "^1.4.2",
+    "chai-string": "^1.5.0"
   },
   "scripts": {
     "build": "tsc",

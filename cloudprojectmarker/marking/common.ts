@@ -1,9 +1,10 @@
 import * as AWS from "aws-sdk";
-import { EC2 } from "aws-sdk";
+import { EC2, STS } from "aws-sdk";
 
 export interface ICommon {
   getSgByName(groupName: string): Promise<EC2.SecurityGroup>;
   printSg(sg: EC2.SecurityGroup): void;
+  getAWSAccount(): Promise<string>;
 }
 
 export class Common implements ICommon {
@@ -39,5 +40,11 @@ export class Common implements ICommon {
     console.log(sg.IpPermissions!.length);
     console.log(sg.IpPermissions![0]);
     console.log(sg.IpPermissions![0].IpRanges);
+  };
+
+  getAWSAccount = async (): Promise<string> => {
+    const sts: AWS.STS = new AWS.STS();
+    const callerId = await sts.getCallerIdentity().promise();
+    return callerId.Account!;
   };
 }
