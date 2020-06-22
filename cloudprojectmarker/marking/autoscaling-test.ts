@@ -271,14 +271,13 @@ done
       .promise();
 
     const lowCapacityMetricAlarm = lowCapacityAlarm.MetricAlarms![0];
-    // console.log(lowCapacityMetricAlarm);
+    //console.log(lowCapacityMetricAlarm);
 
     let expected = {
       ActionsEnabled: true,
       OKActions: [],
       AlarmActions: [lowCapacityPolicy!.PolicyARN!],
       InsufficientDataActions: [],
-      StateValue: "ALARM",
       MetricName: "ApproximateNumberOfMessagesVisible",
       Namespace: "AWS/SQS",
       Statistic: "Average",
@@ -290,7 +289,7 @@ done
       Metrics: [],
     };
 
-    // console.log(expected);
+    //console.log(expected);
     expect(
       lowCapacityMetricAlarm,
       "Low Capacity alarm for To_Be_Processed_Queue."
@@ -312,7 +311,6 @@ done
       OKActions: [],
       AlarmActions: [highCapacityPolicy!.PolicyARN!],
       InsufficientDataActions: [],
-      StateValue: "OK",
       MetricName: "ApproximateNumberOfMessagesVisible",
       Namespace: "AWS/SQS",
       Statistic: "Average",
