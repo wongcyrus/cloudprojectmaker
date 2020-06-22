@@ -1,6 +1,6 @@
-import { Runner } from "mocha";
+import * as Mocha from "mocha";
 
-const AWS = require("aws-sdk");
+import AWS = require("aws-sdk");
 
 export interface GraderEvent {
   aws_access_key?: string;
@@ -16,7 +16,7 @@ export const lambdaHandler = async (
 ): Promise<GraderResult> => {
   console.log(event);
 
-  const Mocha = require("mocha");
+  // const Mocha = require("mocha");
   const fs = require("fs");
   const path = require("path");
 

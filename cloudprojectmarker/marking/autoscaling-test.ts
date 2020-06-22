@@ -6,6 +6,7 @@ import { Common } from "./common";
 
 import * as chai from "chai";
 import * as chaiSubset from "chai-subset";
+import { AutoScalingGroup } from "aws-sdk/clients/autoscaling";
 chai.use(chaiSubset);
 
 describe("AutoScaling", () => {
@@ -15,14 +16,20 @@ describe("AutoScaling", () => {
   const cloudWatch: AWS.CloudWatch = new AWS.CloudWatch();
   const common = new Common();
 
-  it("should set properly.", async () => {
+  let autoScalingGroup: AutoScalingGroup;
+  let awsAccount: string;
+  before(async () => {
+    awsAccount = await common.getAWSAccount();
     const autoScalingGroups = await autoScaling
       .describeAutoScalingGroups({
         AutoScalingGroupNames: ["SqsAutoScalingGroup"],
       })
       .promise();
-    // console.log(autoScalingGroups.AutoScalingGroups![0]);
+    autoScalingGroup = autoScalingGroups.AutoScalingGroups![0];
+    // console.log(autoScalingGroup);
+  });
 
+  it("should set properly.", async () => {
     const expected = {
       AutoScalingGroupName: "SqsAutoScalingGroup",
       MinSize: 0,
@@ -35,22 +42,13 @@ describe("AutoScaling", () => {
     };
 
     expect(
-      autoScalingGroups.AutoScalingGroups![0],
+      autoScalingGroup,
       "min 0, max 5, desired 0, cooldown 5 mins, grace period 5 mins and HealthCheckType to EC2."
     ).to.containSubset(expected);
   });
 
   it("should have a Launch Configuration in instance type t2.nano.", async () => {
-    const autoScalingGroups = await autoScaling
-      .describeAutoScalingGroups({
-        AutoScalingGroupNames: ["SqsAutoScalingGroup"],
-      })
-      .promise();
-    // console.log(
-    //   autoScalingGroups.AutoScalingGroups![0].LaunchConfigurationName
-    // );
-    const launchConfigurationName = autoScalingGroups.AutoScalingGroups![0]
-      .LaunchConfigurationName;
+    const launchConfigurationName = autoScalingGroup.LaunchConfigurationName;
 
     const launchConfigurations = await autoScaling
       .describeLaunchConfigurations({
@@ -66,16 +64,7 @@ describe("AutoScaling", () => {
   });
 
   it("should have a Launch Configuration with correct UserData.", async () => {
-    const autoScalingGroups = await autoScaling
-      .describeAutoScalingGroups({
-        AutoScalingGroupNames: ["SqsAutoScalingGroup"],
-      })
-      .promise();
-    // console.log(
-    //   autoScalingGroups.AutoScalingGroups![0].LaunchConfigurationName
-    // );
-    const launchConfigurationName = autoScalingGroups.AutoScalingGroups![0]
-      .LaunchConfigurationName;
+    const launchConfigurationName = autoScalingGroup.LaunchConfigurationName;
 
     const launchConfigurations = await autoScaling
       .describeLaunchConfigurations({
@@ -137,16 +126,7 @@ done
   });
 
   it("should have a proper IAM Role Permission.", async () => {
-    const autoScalingGroups = await autoScaling
-      .describeAutoScalingGroups({
-        AutoScalingGroupNames: ["SqsAutoScalingGroup"],
-      })
-      .promise();
-    // console.log(
-    //   autoScalingGroups.AutoScalingGroups![0].LaunchConfigurationName
-    // );
-    const launchConfigurationName = autoScalingGroups.AutoScalingGroups![0]
-      .LaunchConfigurationName;
+    const launchConfigurationName = autoScalingGroup.LaunchConfigurationName;
 
     const launchConfigurations = await autoScaling
       .describeLaunchConfigurations({
@@ -192,16 +172,15 @@ done
       })
       .promise();
 
-    const awsAccountId = await common.getAWSAccount();
     const inlinePolicyDcoument = JSON.parse(
       decodeURIComponent(policy.PolicyDocument)
     );
     // console.log(inlinePolicyDcoument);
     expected = `{"Version":"2012-10-17",
     "Statement":[
-    {"Action":["logs:CreateLogStream","logs:PutLogEvents"],"Resource":"arn:aws:logs:us-east-1:${awsAccountId}:log-group:/cloudproject/batchprocesslog:*","Effect":"Allow"},
-    {"Action":"logs:DescribeLogStreams","Resource":"arn:aws:logs:us-east-1:${awsAccountId}:log-group:/cloudproject/batchprocesslog:*","Effect":"Allow"},
-    {"Action":["sqs:ReceiveMessage","sqs:ChangeMessageVisibility","sqs:GetQueueUrl","sqs:DeleteMessage","sqs:GetQueueAttributes"],"Resource":"arn:aws:sqs:us-east-1:${awsAccountId}:To_Be_Processed_Queue","Effect":"Allow"}]}`;
+    {"Action":["logs:CreateLogStream","logs:PutLogEvents"],"Resource":"arn:aws:logs:us-east-1:${awsAccount}:log-group:/cloudproject/batchprocesslog:*","Effect":"Allow"},
+    {"Action":"logs:DescribeLogStreams","Resource":"arn:aws:logs:us-east-1:${awsAccount}:log-group:/cloudproject/batchprocesslog:*","Effect":"Allow"},
+    {"Action":["sqs:ReceiveMessage","sqs:ChangeMessageVisibility","sqs:GetQueueUrl","sqs:DeleteMessage","sqs:GetQueueAttributes"],"Resource":"arn:aws:sqs:us-east-1:${awsAccount}:To_Be_Processed_Queue","Effect":"Allow"}]}`;
     expected = JSON.parse(expected);
     expect(expected, "permission for log group, and SQS.").to.deep.equal(
       inlinePolicyDcoument

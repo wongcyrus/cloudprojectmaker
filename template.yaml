@@ -50,8 +50,14 @@ Resources:
       CodeUri: cloudprojectmarker/
       Handler: app.lambdaHandler
       Policies:
+      # You may need to add more read only policies if you hit error in Lambda but not in cloud9 local invoke.
         - arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
         - arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSLambdaReadOnlyAccess
+        - arn:aws:iam::aws:policy/IAMReadOnlyAccess
+        - arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingReadOnly
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
       Layers:
         - !Ref LibLayer        
 
