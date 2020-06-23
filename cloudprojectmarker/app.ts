@@ -1,6 +1,7 @@
 import * as Mocha from "mocha";
-
 import AWS = require("aws-sdk");
+import fs = require("fs");
+import path = require("path");
 
 export interface GraderEvent {
   aws_access_key?: string;
@@ -15,10 +16,6 @@ export const lambdaHandler = async (
   event: GraderEvent
 ): Promise<GraderResult> => {
   console.log(event);
-
-  // const Mocha = require("mocha");
-  const fs = require("fs");
-  const path = require("path");
 
   const mocha = new Mocha({
     reporter: "json",
@@ -51,7 +48,10 @@ export const lambdaHandler = async (
     });
   // mocha.addFile(path.join(testDir, "alb-test.js"));
 
+  mocha.addFile("hook.js");
   process.env.studentData = JSON.stringify(event);
+
+  mocha.retries(3);
 
   const waitForTest = async () =>
     new Promise((resolve) => {
