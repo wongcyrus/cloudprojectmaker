@@ -19,6 +19,7 @@
     "ts-node": "^8.10.1",
     "typescript": "^3.9.3",
     "chai": "^4.2.0",
-    "mocha": "^6.2.3"
+    "mocha": "^6.2.3",
+    "mochawesome": "^6.1.1"
   }
 }

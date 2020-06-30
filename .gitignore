@@ -10,4 +10,3 @@
 .aws-sam/
 events/event.json
 output.json
-testResult.json
