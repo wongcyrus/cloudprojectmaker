@@ -14,6 +14,9 @@ cd cloud-project-marker/
 
 ./deployment.sh
 
+## Review mochawesome test report 
+Use the CloudFormation Stack output TestReportBucketSecureURL.
+
 ## Run Lambda Local in the current AWS Account.
 
 sam local invoke CloudProjectMarkerFunction
