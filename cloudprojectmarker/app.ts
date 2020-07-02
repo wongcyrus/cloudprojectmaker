@@ -9,6 +9,7 @@ export interface GraderEvent {
   aws_access_key?: string;
   aws_secret_access_key?: string;
   aws_session_token?: string;
+  graderParameter?: string;
 }
 interface GraderResult {
   testResult: string;
@@ -57,7 +58,14 @@ export const lambdaHandler = async (
   // mocha.addFile(path.join(testDir, "alb-test.js"));
 
   mocha.addFile("hook.js");
-  process.env.studentData = JSON.stringify(event);
+  process.env.event = JSON.stringify(event);
+
+  if (event.graderParameter) {
+    process.env.graderParameter = event.graderParameter;
+    const graderParameter = JSON.parse(process.env.graderParameter);
+    console.log("graderParameter");
+    console.log(graderParameter);
+  }
 
   mocha.retries(3);
 

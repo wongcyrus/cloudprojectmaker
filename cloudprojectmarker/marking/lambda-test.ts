@@ -213,9 +213,9 @@ describe("Lambda", () => {
 
     //console.log(sqsStatement);
     expect(
-      ["sqs:SendMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"],
+      ["sqs:SendMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"].sort(),
       "3 queue actions"
-    ).to.deep.eq(sqsStatement.Action);
+    ).to.deep.eq(sqsStatement.Action.sort());
   });
 
   it("should have Resource-based policy.", async () => {
