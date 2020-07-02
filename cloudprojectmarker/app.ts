@@ -3,7 +3,7 @@ import AWS = require("aws-sdk");
 import fs = require("fs");
 import path = require("path");
 
-const testReportBucket = "cloudprojectmarker-testreportbucket-azn2uqge15op";
+const testReportBucket = process.env.TestReportBucket;
 
 export interface GraderEvent {
   aws_access_key?: string;
