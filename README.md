@@ -16,6 +16,7 @@ cd cloud-project-marker/
 
 ## Review mochawesome test report 
 Use the CloudFormation Stack output TestReportBucketSecureURL.
+aws cloudformation describe-stacks --stack-name cloudprojectmarker --query 'Stacks[0].Outputs[?OutputKey==`TestReportBucketSecureURL`].OutputValue' --output text
 
 ## Run Lambda Local in the current AWS Account.
 
