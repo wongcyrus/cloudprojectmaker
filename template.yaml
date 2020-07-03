@@ -122,7 +122,9 @@ Outputs:
     Value: !GetAtt CloudProjectMarkerFunction.Arn
   CheckMarkWebUiUrl:
     Description: URL for teacher to get the assume role URL for your student account.
-    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'    
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
+  TestReportBucket:
+    Value: !Ref TestReportBucket
   TestReportBucketSecureURL:
     Value: !Join 
       - ''

@@ -1,5 +1,6 @@
 {
-  "aws_access_key": "ASIA6GJLGBQECZ45TRHY",
-  "aws_secret_access_key": "l0U6EUvzihKcml8stTF+h7WNN0mYMndbvMzGpPf8",
-  "aws_session_token":""
+  "graderParameter":"{\"Name\": \"Cyrus Wong\",    \"class\": \"IT114115\"}",
+  "aws_access_key": "zzzz",
+  "aws_secret_access_key": "XXXX",
+  "aws_session_token":"yyy"
 }

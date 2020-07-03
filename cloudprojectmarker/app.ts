@@ -4,6 +4,7 @@ import fs = require("fs");
 import path = require("path");
 
 const testReportBucket = process.env.TestReportBucket;
+console.log(testReportBucket);
 
 export interface GraderEvent {
   aws_access_key?: string;
