@@ -72,6 +72,8 @@ exports.lambdaHandler = async(event, context) => {
             <input type="hidden" name="action" value="validate_captcha">
             <label for="credentials">Credentials:</label><br>
             <textarea id="rawKey" name="rawKey" rows="10" cols="100" required></textarea><br>
+            <label for="gradeFunctionParameters">Parameter json:</label><br>
+            <textarea id="gradeFunctionParameters" name="gradeFunctionParameters" rows="20" cols="100" required>{}</textarea><br>
             ${recaptcha}
         </form> 
         <footer>
@@ -89,7 +91,39 @@ exports.lambdaHandler = async(event, context) => {
         const parameters = querystring.parse(body);
 
         console.log(parameters);
-
+        const IsJsonString = (str) => {
+            try {
+                JSON.parse(str);
+            }
+            catch (e) {
+                return false;
+            }
+            return true;
+        };
+        if (!IsJsonString(parameters.gradeFunctionParameters)) {
+            return {
+                "headers": {
+                    "Content-Type": "text/html"
+                },
+                "statusCode": 200,
+                "body": `
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>Managed AWS Educate Classroom Setup Grader Parameters - Error</title>
+    </head>
+    <body>
+        <h2>Managed AWS Educate Classroom Setup Grader Parameters - Error</h2>
+        <h1>Invalid JSON</h1>
+         ${parameters.gradeFunctionParameters}
+        <footer>
+          <p>Developed by <a href="https://www.vtc.edu.hk/admission/en/programme/it114115-higher-diploma-in-cloud-and-data-centre-administration/"> Higher Diploma in Cloud and Data Centre Administration Team.</a></p>
+        </footer>
+    </body>
+</html>
+        `,
+            };
+        }
         if (recaptchaSercetKey !== "") {
             const token =  parameters["g-recaptcha-response"][0];
             let verifyResult = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSercetKey}&response=${token}`);
@@ -115,6 +149,8 @@ exports.lambdaHandler = async(event, context) => {
 
         delete parameters.rawKey;
 
+        parameters.graderParameter = parameters.gradeFunctionParameters;
+        delete parameters.gradeFunctionParameters;
         console.log(parameters);
 
         let params = {
