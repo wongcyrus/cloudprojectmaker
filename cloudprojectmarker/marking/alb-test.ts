@@ -3,6 +3,7 @@ import { expect } from "chai";
 import "mocha";
 import * as AWS from "aws-sdk";
 import { Common } from "./common";
+import { Helper } from "./../helper";
 
 import * as chai from "chai";
 import * as chaiSubset from "chai-subset";
@@ -18,6 +19,21 @@ describe("Application Load Balancing", () => {
 
   let alb: LoadBalancer;
   let awsAccount: string;
+  let graderParmeters: any;
+
+  before(async () => {
+    const helper = new Helper();
+    graderParmeters = helper.getGraderParmeters();
+    console.log(graderParmeters);
+
+    awsAccount = await common.getAWSAccount();
+    const albs = await elb
+      .describeLoadBalancers({ Names: ["WebAlb"] })
+      .promise();
+    alb = albs.LoadBalancers![0];
+    // console.log(alb);
+  });
+
   before(async () => {
     awsAccount = await common.getAWSAccount();
     const albs = await elb

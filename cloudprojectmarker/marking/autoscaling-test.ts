@@ -36,7 +36,6 @@ describe("AutoScaling", () => {
       MaxSize: 5,
       DesiredCapacity: 0,
       DefaultCooldown: 300,
-      AvailabilityZones: ["us-east-1a", "us-east-1b"],
       HealthCheckType: "EC2",
       HealthCheckGracePeriod: 300,
     };
@@ -45,6 +44,10 @@ describe("AutoScaling", () => {
       autoScalingGroup,
       "min 0, max 5, desired 0, cooldown 5 mins, grace period 5 mins and HealthCheckType to EC2."
     ).to.containSubset(expected);
+
+    expect(2, "uses 2 Availability Zones.").to.be.eq(
+      autoScalingGroup.AvailabilityZones.length
+    );
   });
 
   it("should have a Launch Configuration in instance type t2.nano.", async () => {

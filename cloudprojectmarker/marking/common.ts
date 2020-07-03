@@ -1,5 +1,5 @@
 import * as AWS from "aws-sdk";
-import { EC2, STS } from "aws-sdk";
+import { EC2 } from "aws-sdk";
 
 export interface ICommon {
   getSgByName(groupName: string): Promise<EC2.SecurityGroup>;
