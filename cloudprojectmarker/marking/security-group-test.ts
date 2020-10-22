@@ -11,7 +11,7 @@ describe("Security Group", () => {
   const common = new Common();
   before(async () => {
     albSg = await common.getSgByName("ALB Security Group");
-    lambdaSg = await common.getSgByName("Lambda Security Group");
+    lambdaSg = await common.getSgByName("Web Lambda Security Group");
     dbSg = await common.getSgByName("Database Security Group");
   });
 
@@ -52,7 +52,7 @@ describe("Security Group", () => {
   });
 
   it("for Database should set properly. ", async () => {
-    // common.printSg(dbSg);
+    common.printSg(dbSg);
 
     expect(1, "Database with only 1 ingress rule").to.equal(
       dbSg.IpPermissions!.length

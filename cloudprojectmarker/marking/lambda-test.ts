@@ -131,7 +131,7 @@ describe("Lambda", () => {
       })
       .promise();
     // console.log(securityGroups);
-    expect("Lambda Security Group", "uses Lambda Security Group").to.eq(
+    expect("Web Lambda Security Group", "uses WebLambda Security Group").to.eq(
       securityGroups.SecurityGroups![0].GroupName
     );
   });
@@ -182,10 +182,10 @@ describe("Lambda", () => {
       decodeURIComponent(inlineRolePolicy.PolicyDocument!)
     );
 
-    //console.log(permission);
+    //console.log(permission.Statement[0]);
 
-    expect(3, "3 permission statements").to.eq(permission.Statement.length);
-    expect(3, "3 Allow permission statements").to.eq(
+    expect(4, "4 permission statements").to.eq(permission.Statement.length);
+    expect(4, "4 Allow permission statements").to.eq(
       permission.Statement.filter((c: any) => c.Effect === "Allow").length
     );
 
@@ -202,6 +202,17 @@ describe("Lambda", () => {
       );
     });
 
+    const arrayEquals = (a: string[], b: string[]) => {
+      return a.length === b.length && a.every((val, index) => val === b[index]);
+    };
+
+    const xrayStatement = permission.Statement.find((s: any) => {
+      return arrayEquals(s.Action, [
+        "xray:PutTraceSegments",
+        "xray:PutTelemetryRecords",
+      ]);
+    });
+
     expect(secretsmanagerStatement.Resource).to.startsWith(
       "arn:aws:secretsmanager:us-east-1:" +
         awsAccount +
@@ -216,6 +227,11 @@ describe("Lambda", () => {
       ["sqs:SendMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"].sort(),
       "3 queue actions"
     ).to.deep.eq(sqsStatement.Action.sort());
+
+    expect(
+      ["xray:PutTraceSegments", "xray:PutTelemetryRecords"].sort(),
+      "2 x-ray actions"
+    ).to.deep.eq(xrayStatement.Action.sort());
   });
 
   it("should have Resource-based policy.", async () => {

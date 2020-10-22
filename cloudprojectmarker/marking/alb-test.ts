@@ -247,14 +247,9 @@ describe("Application Load Balancing", () => {
       .TargetHealthDescriptions!.map((c) => c.Target!.Id)
       .sort();
     // console.log(dummyIpTargets);
-    const expectedDummyIpTargets = [
-      "10.0.0.10",
-      "10.0.1.10",
-      "10.0.4.10",
-      "10.0.8.10",
-    ];
-    expect(expectedDummyIpTargets, "4 ip in each subnets").to.deep.eq(
-      dummyIpTargets
+    const expectedDummyIpTargets = ["10.0.4.4", "10.0.8.4"];
+    expect(dummyIpTargets, "2 ip in 2 public subnets").to.deep.eq(
+      expectedDummyIpTargets
     );
 
     const lambdaTargetHealth = await elb
