@@ -34,15 +34,6 @@ describe("Application Load Balancing", () => {
     // console.log(alb);
   });
 
-  before(async () => {
-    awsAccount = await common.getAWSAccount();
-    const albs = await elb
-      .describeLoadBalancers({ Names: ["WebAlb"] })
-      .promise();
-    alb = albs.LoadBalancers![0];
-    // console.log(alb);
-  });
-
   it("should be internet facing ALB.", async () => {
     const expected = {
       Scheme: "internet-facing",

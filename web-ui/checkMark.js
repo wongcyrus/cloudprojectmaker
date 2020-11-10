@@ -164,7 +164,7 @@ exports.lambdaHandler = async(event, context) => {
 
         return {
             "headers": {
-                "Content-Type": "text/html"
+                "Content-Type": "application/json"
             },
             "statusCode": 200,
             "body": testReport,
