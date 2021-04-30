@@ -49,3 +49,23 @@ aws lambda invoke --function-name \$CloudProjectMarkerFunction output.json
 git pull
 
 sam build
+
+
+## For AWS Academy Learner Lab, events/event.json in this format without session token.
+
+{
+  "graderParameter":"{\"Name\": \"Cyrus Wong\",    \"class\": \"IT114115\"}",
+  "aws_access_key": "XXXXX",
+  "aws_secret_access_key": "YYYY"
+}
+
+
+## For AWS Educate Classroom, events/event.json in this format with session token.
+
+{
+  "graderParameter":"{\"Name\": \"Cyrus Wong\",    \"class\": \"IT114115\"}",
+  "aws_access_key": "XXXXX",
+  "aws_secret_access_key": "YYYY",
+  "aws_session_token":"ZZZZ"
+}
+
