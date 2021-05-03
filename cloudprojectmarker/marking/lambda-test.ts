@@ -79,6 +79,7 @@ describe("Lambda", () => {
     //       sqsEndpointDnsEntry: 'https://vpce-0c2b0e2cc8e75457f-c73y9z4y.sqs.us-east-1.vpce.amazonaws.com',
     //       queueUrl: 'https://sqs.us-east-1.amazonaws.com/714548190053/To_Be_Processed_Queue',
     //       dbSecretArn: 'arn:aws:secretsmanager:us-east-1:714548190053:secret:AuroraServerlessMasterUserS-sODUOeZboGNc-oDLWwA'
+    //       messageTableName: 'MainStack-databaseMessageTable70E9DD6C-3RIVSFWWBLBS'
     //     }
     const envVariables = lambdaFunction.Configuration!.Environment!.Variables;
     expect(envVariables, "VPC Endpoint for secretsManager").to.haveOwnProperty(
@@ -92,6 +93,10 @@ describe("Lambda", () => {
     );
     expect(envVariables, "secretsManager arn").to.haveOwnProperty(
       "dbSecretArn"
+    );
+
+    expect(envVariables, "DynamoDB table name").to.haveOwnProperty(
+      "messageTableName"
     );
   });
 
@@ -131,12 +136,12 @@ describe("Lambda", () => {
       })
       .promise();
     // console.log(securityGroups);
-    expect("Web Lambda Security Group", "uses WebLambda Security Group").to.eq(
+    expect("Web Lambda Security Group", "uses Web Lambda Security Group").to.eq(
       securityGroups.SecurityGroups![0].GroupName
     );
   });
 
-  it("should have permisssion.", async () => {
+  it("should have permission.", async () => {
     const lambdaFunction = await lambda
       .getFunction({ FunctionName: "WebLambda" })
       .promise();
@@ -184,8 +189,8 @@ describe("Lambda", () => {
 
     //console.log(permission.Statement[0]);
 
-    expect(4, "4 permission statements").to.eq(permission.Statement.length);
-    expect(4, "4 Allow permission statements").to.eq(
+    expect(5, "5 permission statements").to.eq(permission.Statement.length);
+    expect(5, "5 Allow permission statements").to.eq(
       permission.Statement.filter((c: any) => c.Effect === "Allow").length
     );
 
@@ -213,10 +218,19 @@ describe("Lambda", () => {
       ]);
     });
 
+    const dynamoDBStatement = permission.Statement.find((s: any) => {
+      return arrayEquals(s.Action, [
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+      ]);
+    });
+
     expect(secretsmanagerStatement.Resource).to.startsWith(
       "arn:aws:secretsmanager:us-east-1:" +
         awsAccount +
-        ":secret:AuroraServerlessMasterUser"
+        ":secret:databaseMasterUserSecret"
     );
     expect(
       "arn:aws:rds:us-east-1:" + awsAccount + ":cluster:CloudProjectDatabase"
@@ -232,6 +246,15 @@ describe("Lambda", () => {
       ["xray:PutTraceSegments", "xray:PutTelemetryRecords"].sort(),
       "2 x-ray actions"
     ).to.deep.eq(xrayStatement.Action.sort());
+    expect(
+      [
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+      ].sort(),
+      "4 DynamoDB actions"
+    ).to.deep.eq(dynamoDBStatement.Action.sort());
   });
 
   it("should have Resource-based policy.", async () => {

@@ -22,7 +22,7 @@ describe("Security Group", () => {
     );
   });
 
-  it("for ALB should set properly. ", async () => {
+  it("for ALB should be set properly. ", async () => {
     // common.printSg(albSg);
 
     expect(1, "ALB with only 1 ingress rule").to.equal(
@@ -58,19 +58,34 @@ describe("Security Group", () => {
     );
   });
 
-  it("for Lambda should set egress properly. ", async () => {
-    //common.printSg(lambdaSg);
+  it("for Lambda should be set egress properly. ", async () => {
+    // common.printSg(lambdaSg);
 
     const ec2Sdk = new EC2({ region: "us-east-1" });
     const prefixLists = await ec2Sdk.describePrefixLists().promise();
+
     const s3PrefixListId =
       prefixLists.PrefixLists?.find(
         (c) => c.PrefixListName === "com.amazonaws.us-east-1.s3"
       )?.PrefixListId || "";
-    const s3EgressRule = lambdaSg.IpPermissionsEgress!.find(
-      (c) => c.PrefixListIds![0].PrefixListId === s3PrefixListId
+    const dynamoDBPrefixListId =
+      prefixLists.PrefixLists?.find(
+        (c) => c.PrefixListName === "com.amazonaws.us-east-1.dynamodb"
+      )?.PrefixListId || "";
+
+    const prefixEgressRule = lambdaSg.IpPermissionsEgress!.find(
+      (c) => c.PrefixListIds!.length == 2
     );
+    expect(prefixEgressRule).exist;
+    const s3EgressRule = prefixEgressRule!.PrefixListIds?.find(
+      (c) => c.PrefixListId === s3PrefixListId
+    );
+    const dynamoDBEgressRule = prefixEgressRule!.PrefixListIds?.find(
+      (c) => c.PrefixListId === dynamoDBPrefixListId
+    );
+
     expect(s3EgressRule).exist;
+    expect(dynamoDBEgressRule).exist;
 
     const dbEgressRule = lambdaSg.IpPermissionsEgress!.find(
       (c) => c.FromPort == 3306 && c.ToPort == 3306
@@ -100,16 +115,20 @@ describe("Security Group", () => {
     ).to.equal(secretManagerEgressRule!.GroupId);
   });
 
-  it("for Database should set properly. ", async () => {
-    //ommon.printSg(dbSg);
+  it("for Database should be set properly. ", async () => {
+    //common.printSg(dbSg);
 
     expect(1, "Database with only 1 ingress rule").to.equal(
       dbSg.IpPermissions!.length
     );
 
-    expect(
-      lambdaSg.GroupId,
-      "Database with ingress rule from Lambda."
-    ).to.equal(dbSg.IpPermissions![0].UserIdGroupPairs![0].GroupId);
+    const dbIngressRule = dbSg.IpPermissions!.find(
+      (c) => c.FromPort == 3306 && c.ToPort == 3306
+    );
+    // console.log(dbIngressRule);
+    const lambdaToDb = dbIngressRule!.UserIdGroupPairs!.find(
+      (c) => c.GroupId === lambdaSg.GroupId
+    );
+    expect(lambdaToDb, "Database with ingress rule from Lambda.").exist;
   });
 });

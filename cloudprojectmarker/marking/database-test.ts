@@ -10,12 +10,14 @@ chai.use(chaiSubset);
 describe("Database", () => {
   const rds: AWS.RDS = new AWS.RDS();
   const secretsManager: AWS.SecretsManager = new AWS.SecretsManager();
+  const dynamoDB: AWS.DynamoDB = new AWS.DynamoDB();
   const ec2: AWS.EC2 = new AWS.EC2();
 
   it("should have one secret.", async () => {
     const secrets = await secretsManager.listSecrets().promise();
+    // console.log(JSON.stringify(secrets));
     const dbSecret = secrets.SecretList!.find((s) =>
-      s.Name!.startsWith("AuroraServerlessMasterUser")
+      s.Name!.startsWith("databaseMasterUserSecret")
     );
     // console.log(dbSecret);
     const value = await secretsManager
@@ -39,9 +41,10 @@ describe("Database", () => {
         Filters: [{ Name: "db-cluster-id", Values: ["cloudprojectdatabase"] }],
       })
       .promise();
-    //console.log(dBClusters.DBClusters![0]);
+    // console.log(dBClusters.DBClusters![0]);
 
     const dbCluster = dBClusters.DBClusters![0];
+    // console.log(JSON.stringify(dbCluster));
 
     const expected = {
       AllocatedStorage: 1,
@@ -61,7 +64,6 @@ describe("Database", () => {
       AssociatedRoles: [],
       IAMDatabaseAuthenticationEnabled: false,
       EnabledCloudwatchLogsExports: [],
-      Capacity: 0,
       EngineMode: "serverless",
       ScalingConfigurationInfo: {
         MinCapacity: 1,
@@ -105,5 +107,56 @@ describe("Database", () => {
 
     expect(subnets.Subnets![0].CidrBlock!, "private subnet.").to.contain("/22");
     expect(subnets.Subnets![1].CidrBlock!, "private subnet.").to.contain("/22");
+  });
+
+  it("should have one DynamoDB Table.", async () => {
+    const tables = await dynamoDB.listTables().promise();
+
+    const messageTableName = tables!.TableNames!.find((c) =>
+      c.includes("MessageTable")
+    );
+    // console.log(messageTableName);
+    const messageTable = await dynamoDB
+      .describeTable({
+        TableName: messageTableName!,
+      })
+      .promise();
+    // console.log(JSON.stringify(messageTable));
+
+    const expected = {
+      Table: {
+        AttributeDefinitions: [
+          {
+            AttributeName: "message",
+            AttributeType: "S",
+          },
+          {
+            AttributeName: "time",
+            AttributeType: "S",
+          },
+        ],
+        TableName: messageTableName!,
+        KeySchema: [
+          {
+            AttributeName: "message",
+            KeyType: "HASH",
+          },
+          {
+            AttributeName: "time",
+            KeyType: "RANGE",
+          },
+        ],
+        TableStatus: "ACTIVE",
+
+        BillingModeSummary: {
+          BillingMode: "PAY_PER_REQUEST",
+        },
+      },
+    };
+
+    expect(
+      messageTable,
+      "with partition key and range key in on demand mode."
+    ).to.containSubset(expected);
   });
 });

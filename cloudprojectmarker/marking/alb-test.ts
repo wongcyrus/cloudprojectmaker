@@ -220,14 +220,16 @@ describe("Application Load Balancing", () => {
         TargetGroupArn: ipTargetGroup!.TargetGroupArn!,
       })
       .promise();
-    //console.log(ipTargetGroupAttributes);
+    // console.log(JSON.stringify(ipTargetGroupAttributes.Attributes));
 
     const expectedIpTargetGroupAttributes = [
       { Key: "stickiness.enabled", Value: "false" },
       { Key: "deregistration_delay.timeout_seconds", Value: "300" },
+      { Key: "stickiness.app_cookie.cookie_name", Value: "" },
       { Key: "stickiness.type", Value: "lb_cookie" },
       { Key: "stickiness.lb_cookie.duration_seconds", Value: "86400" },
       { Key: "slow_start.duration_seconds", Value: "0" },
+      { Key: "stickiness.app_cookie.duration_seconds", Value: "86400" },
       { Key: "load_balancing.algorithm.type", Value: "round_robin" },
     ];
 
@@ -247,7 +249,7 @@ describe("Application Load Balancing", () => {
       .TargetHealthDescriptions!.map((c) => c.Target!.Id)
       .sort();
     // console.log(dummyIpTargets);
-    const expectedDummyIpTargets = ["10.0.4.4", "10.0.8.4"];
+    const expectedDummyIpTargets = ["10.0.0.4", "10.0.1.4"];
     expect(dummyIpTargets, "2 ip in 2 public subnets").to.deep.eq(
       expectedDummyIpTargets
     );

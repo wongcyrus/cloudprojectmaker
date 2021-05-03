@@ -32,10 +32,6 @@ sam local invoke CloudProjectMarkerFunction --env-vars env.json | jq -cr .testRe
 
 sam local invoke --env-vars env.json -e events/event.json CloudProjectMarkerFunction | jq -cr .testResult | jq . > testResult.json
 
-## During test case development, Run SAM Build and Lambda Local in the other AWS Account.
-
-sam build && sam local invoke -e events/event.json CloudProjectMarkerFunction
-
 ## Run the Lambda
 
 CloudProjectMarkerFunction=\$(aws cloudformation describe-stacks --stack-name cloudprojectmarker \
@@ -69,3 +65,16 @@ sam build
   "aws_session_token":"ZZZZ"
 }
 
+# For Educators Developing test case
+Run Typescript compiler at background.
+
+cd cloudprojectmarker
+npm run watch
+
+## During test case development, Run Quick SAM Build and Lambda Local in the other AWS Account.
+
+./quick-test.sh
+
+## During test case development, Run full SAM build and Lambda Local in the other AWS Account.
+
+sam build && sam local invoke -e events/event.json CloudProjectMarkerFunction
