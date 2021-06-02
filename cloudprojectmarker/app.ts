@@ -56,7 +56,7 @@ export const lambdaHandler = async (
       delete require.cache[_sPathSpec];
       mocha.addFile(path.join(testDir, file));
     });
-  // mocha.addFile(path.join(testDir, "alb-test.js"));
+  // mocha.addFile(path.join(testDir, "security-group-test.js"));
 
   mocha.addFile("hook.js");
   process.env.event = JSON.stringify(event);
