@@ -3,7 +3,7 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "cloudprojectmarker"
-s3_bucket = "cdktoolkit-stagingbucket-1ler5oavwo58f"
+s3_bucket = "cdktoolkit-stagingbucket-5hdtn2g57lif"
 s3_prefix = "cloudprojectmarker"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"

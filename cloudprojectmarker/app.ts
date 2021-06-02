@@ -35,12 +35,14 @@ export const lambdaHandler = async (
   const testDir = "marking/";
 
   if (event.aws_access_key) {
-    AWS.config.update({
-      accessKeyId: event.aws_access_key,
-      secretAccessKey: event.aws_secret_access_key,
-      sessionToken: event.aws_session_token,
+    let credentials: any = {
+      accessKeyId: event.aws_access_key!,
+      secretAccessKey: event.aws_secret_access_key!,
       region: "us-east-1",
-    });
+    };
+    if (event.aws_session_token)
+      credentials.sessionToken = event.aws_session_token!;
+    AWS.config.update(credentials);
   }
 
   // Add each .js file to the mocha instance
